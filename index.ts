@@ -8,6 +8,8 @@ const swaggerSpec = require('./lib/swagger');
 const { connectDB } = require('./config/db');
 const Response = require('./lib/response'); 
 
+const job = require('./src/lib/cron')
+
 const {app,server} = require('./src/lib/socket')
 
 
@@ -20,10 +22,13 @@ dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
+
+
 // Swagger
 app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Middlewares
+job.start();
 app.use(express.json());
 app.use(cors({ origin: '*', credentials: true }));
 app.use(helmet());
