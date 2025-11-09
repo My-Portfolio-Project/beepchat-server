@@ -8,7 +8,7 @@
     "postinstall": "npm install --include=dev",
     "dev": "nodemon --exec ts-node index.ts",
     "build": "tsc",
-    "start": "node dist/index.ts"
+    "start": "node dist/index.js"
   },
   "type": "commonjs",
   "keywords": [],
@@ -32,12 +32,13 @@
     "redis": "^5.9.0",
     "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-     "@types/node": "^24.9.2"
+    "swagger-ui-express": "^5.0.1"
+   
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.5",
+      "@types/node": "^24.9.2",
     "@types/joi": "^17.2.3",
     "nodemon": "^3.1.10",
     "prisma": "^6.18.0",
