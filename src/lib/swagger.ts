@@ -1,7 +1,7 @@
 const swaggerJsDoc = require('swagger-jsdoc');
-const dotenv = require('dotenv');
 
-dotenv.config();
+
+
 const PORT = process.env.PORT || 5000;
 
 const options = {

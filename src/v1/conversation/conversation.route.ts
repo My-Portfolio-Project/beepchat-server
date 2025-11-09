@@ -1,4 +1,4 @@
-const express = require('express')
+import express from 'express';
 
 const router = express.Router()
 
@@ -39,7 +39,7 @@ const router = express.Router()
 router.post('/')
 
 
-router.get()
+router.get('/')
 
 
 

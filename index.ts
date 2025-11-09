@@ -4,9 +4,9 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpec = require('./lib/swagger'); 
+const swaggerSpec = require('./src/lib/swagger'); 
 const { connectDB } = require('./config/db');
-const Response = require('./lib/response'); 
+
 
 const job = require('./src/lib/cron')
 
@@ -36,14 +36,14 @@ app.use(morgan('dev'));
 
 // Example root route
 app.get('/', (req: ApiResponse, res:ApiResponse) => {
-  return Response(res, 200, { message: 'Welcome to the API' });
+  return res.status(200).json( { message: 'Welcome to the API' });
 });
 
 app.use('/api/v1/auth', authRoutes)
 
 
 app.use('*', (req: ApiResponse, res: ApiResponse) => {
-  return Response(res, 404, null, 'Route not found');
+  return res.status(404).json({ message: 'Route not found'});
 });
 
 // Start server
