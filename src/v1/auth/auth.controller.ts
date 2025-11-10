@@ -20,7 +20,7 @@ async function register(req: Request, res: Response) {
       });
     }
 
-    // Check if user already exists
+
     const existingUser = await prisma.user.findFirst({
       where: { email },
     });
@@ -34,7 +34,7 @@ async function register(req: Request, res: Response) {
 
     const hashedPassword = await argon.hash(password);
 
-    // Create user
+  
     const user = await prisma.user.create({
       data: {
         fullName,

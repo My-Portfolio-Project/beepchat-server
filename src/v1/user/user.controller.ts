@@ -3,9 +3,11 @@
 
 
 import { Request, Response } from 'express';
-const prisma = require('../../../config/db');
+const {prisma }= require('../../../config/db');
 const argon = require('argon2');
 const generateToken = require('../../lib/generateToken');
+
+const jwt = require('jsonwebtoken')
 
 /**
  * 🧩 CREATE USER
@@ -141,10 +143,69 @@ async function deleteUser(req: Request, res: Response) {
   }
 }
 
+
+
+/**
+ * Get Sidebar Users (all users except current)
+ */
+async function sidebarUser(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user.id;
+    if (!userId) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+    // Get all users except current
+    const users = await prisma.user.findMany({
+      where: { id: { not: userId } },
+      select: { id: true, fullName: true, email: true },
+    });
+
+    return res.status(200).json(users);
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({
+      message: error?.message || 'Internal server error',
+    });
+  }
+}
+
+
+
+/**
+ * Get Logged-in profile
+ */
+async function profile(req: Request, res: Response) {
+  try {
+    const user = (req as any).user; 
+
+    if (!user) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
+
+    return res.status(200).json({
+      message: 'Profile fetched successfully',
+      user,
+    });
+
+  } catch (error: any) {
+    console.error(error);
+    return res.status(500).json({
+      message: error?.message || 'Internal server error',
+    });
+  }
+}
+
+module.exports = profile;
+
+
 module.exports = {
   createUser,
   getAllUsers,
   getUserById,
   updateUser,
   deleteUser,
+  sidebarUser,
+  profile
 };

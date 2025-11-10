@@ -1,61 +1,88 @@
 // src/v1/chat/chat.controller.ts
 
 import { Request, Response } from 'express';
-const prisma = require('../../../config/db');
+const  {prisma } = require('../../../config/db');
 
 const configureCloudinary = require('../../lib/cloudinary');
 
 const cloudinary = configureCloudinary();
 
 
+
 /**
- * Get Sidebar Users (all users except current)
+ * Get all conversation
  */
-async function sidebarUser(req: Request, res: Response) {
+ async function allConversation(req: Request, res: Response) {
   try {
-    const userId = req.cookies.id;
+    const userId = (req as any).user.id;
+
     if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
+      return res.status(400).json({ message: 'User not authenticated' });
     }
 
-    // Get all users except current
-    const users = await prisma.user.findMany({
-      where: { id: { not: userId } },
-      select: { id: true, fullName: true, email: true },
+    console.log('Fetching conversations for user:', userId);
+
+    // Fetch all conversations where user is sender or receiver
+    const conversations = await prisma.conversation.findMany({
+      where: {
+        OR: [
+          { senderId: userId },
+          { receiverId: userId },
+        ],
+      },
+      include: {
+        messages: {
+          orderBy: { createdAt: 'asc' },
+          include: { user: true },
+        },
+      },
+      orderBy: {
+        updatedAt: 'desc',
+      },
     });
 
-    return res.status(200).json(users);
+    if (!conversations || conversations.length === 0) {
+      return res.status(404).json({ message: 'No conversations found' });
+    }
+
+    return res.status(200).json(conversations);
   } catch (error: any) {
-    console.error(error);
+    console.error('Error fetching conversations:', error);
     return res.status(500).json({
       message: error?.message || 'Internal server error',
     });
   }
 }
 
+
+
 /**
  * Get Conversation between two users
  */
 async function getConversation(req: Request, res: Response) {
   try {
-    const recieverId = req.params.recieverId;
-    const senderId = req.cookies.id;
+    const receiverId = req.params.id;
+    const senderId = (req as any).user.id;
 
-    if (!recieverId || !senderId) {
+    // console.log('sender id:', senderId)
+    // console.log('receiver id:', receiverId)
+
+
+    if (!receiverId || !senderId) {
       return res.status(400).json({ message: 'Sender or receiver ID missing' });
     }
 
-    // Find conversation between sender and receiver
+
     let conversation = await prisma.conversation.findFirst({
       where: {
         OR: [
-          { senderId, receiverId: recieverId },
-          { senderId: recieverId, receiverId: senderId },
+          { senderId, receiverId: receiverId },
+          { senderId: receiverId, receiverId: senderId },
         ],
       },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: 'desc' },
           include: { user: true },
         },
       },
@@ -76,17 +103,19 @@ async function getConversation(req: Request, res: Response) {
 
 
 
-
 /**
  * Send a message
  */
 async function sendMessage(req: Request, res: Response) {
   try {
-    const senderId = req.cookies.id;
-    const receiverId = req.params.recieverId;
+  const receiverId = req.params.id;
+    const senderId = (req as any).user.id;
+
+   
+
     const { message, image } = req.body;
 
-    if (!senderId || !receiverId || !message) {
+    if ( !receiverId || !message) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
@@ -140,6 +169,9 @@ async function sendMessage(req: Request, res: Response) {
           senderId,
           receiverId,
           message: newMessage.id
+      },
+      include: {
+        message: true
       }
     })
 
@@ -151,4 +183,4 @@ async function sendMessage(req: Request, res: Response) {
     });
   }
 }
-module.exports = { sidebarUser, getConversation, sendMessage };
+module.exports = { allConversation,  getConversation, sendMessage };

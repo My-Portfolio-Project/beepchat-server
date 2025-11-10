@@ -16,8 +16,8 @@ async function generateToken  (id: string, res: Response){
 
     res.cookie('token', token , {
         httpOnly: true,
-        sameSite:process.env.Node === 'production' ,
-        secure: true,
+        sameSite:'strict' ,
+        secure: false,
         maxAge: 7 * 60 * 60 * 1000
 
     })

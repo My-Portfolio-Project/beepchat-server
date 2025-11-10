@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./src/lib/swagger'); 
 const { connectDB } = require('./config/db');
+const cookieParser = require('cookie-parser')
 
 
 const job = require('./src/lib/cron')
@@ -16,6 +17,9 @@ const {app,server} = require('./src/lib/socket')
 import { Response as ApiResponse } from "express";
 
 const authRoutes = require('./src/v1/auth/auth.route')
+const conversationRoutes = require('./src/v1/conversation/conversation.route')
+const userRoutes = require('./src/v1/user/user.route')
+const storyRoutes = require('./src/v1/story/story.route')
 
 dotenv.config();
 
@@ -31,6 +35,7 @@ app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 job.start();
 app.use(express.json());
 app.use(cors({ origin: '*', credentials: true }));
+app.use(cookieParser())
 app.use(helmet());
 app.use(morgan('dev'));
 
@@ -40,6 +45,9 @@ app.get('/', (req: ApiResponse, res:ApiResponse) => {
 });
 
 app.use('/api/v1/auth', authRoutes)
+app.use('/api/v1/conversation', conversationRoutes)
+app.use('/api/v1/users', userRoutes)
+app.use('/api/v1/storys', userRoutes)
 
 
 app.use('*', (req: ApiResponse, res: ApiResponse) => {

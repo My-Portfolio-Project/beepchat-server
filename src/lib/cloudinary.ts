@@ -1,7 +1,7 @@
 
 // src/lib/cloudinary.ts
 const { v2: cloudinary } = require('cloudinary');
-const dotenv = require('dotenv');
+import dotenv from 'dotenv'
 
 dotenv.config();
 

@@ -5,7 +5,10 @@ const {
   getUserById,
   updateUser,
   deleteUser,
+  profile,
 } = require('./user.controller');
+
+const protect = require('../../middlewares/auth.guard')
 
 const router = express.Router();
 
@@ -15,6 +18,27 @@ const router = express.Router();
  *   name: Users
  *   description: User management endpoints
  */
+
+/**
+ * @swagger
+ * /users/profile
+ * tags: [Users]
+ * get:
+ * summary: To fetch in loggedin user
+ * schema:
+ * type: string
+ * required: true
+ * 
+ * 
+ * responses:
+ * 200:
+ * description: User fetched
+ * 500:
+ * description: Internal server error
+ * 
+ */
+
+router.get('/profile', protect, profile)
 
 /**
  * @swagger
@@ -78,7 +102,7 @@ router.get('/', getAllUsers);
  *       404:
  *         description: User not found
  */
-router.get('/:id', getUserById);
+router.get('/:id', protect, getUserById);
 
 /**
  * @swagger
@@ -110,7 +134,7 @@ router.get('/:id', getUserById);
  *       404:
  *         description: User not found
  */
-router.put('/:id', updateUser);
+router.put('/:id', protect, updateUser);
 
 /**
  * @swagger
@@ -131,6 +155,8 @@ router.put('/:id', updateUser);
  *       404:
  *         description: User not found
  */
-router.delete('/:id', deleteUser);
+router.delete('/:id', protect, deleteUser);
+
+
 
 module.exports = router;

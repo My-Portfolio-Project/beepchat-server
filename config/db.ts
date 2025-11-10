@@ -1,14 +1,12 @@
 // config/db.ts
-import { PrismaClient } from '@prisma/client';
-import dotenv from 'dotenv';
+const { PrismaClient } = require('@prisma/client');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
 const prisma = new PrismaClient();
 
-export default prisma;
-
-export async function connectDB() {
+async function connectDB() {
   try {
     await prisma.$connect();
     console.log('✅ Database connected successfully');
@@ -18,5 +16,4 @@ export async function connectDB() {
   }
 }
 
-
-module.exports = {prisma, connectDB}
+module.exports = { prisma, connectDB };

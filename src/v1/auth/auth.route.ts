@@ -3,7 +3,8 @@ import express from 'express';
 
 
 const router = express.Router()
-const {register, login} = require('../auth/auth.controller')
+const {register, login,logout} = require('../auth/auth.controller')
+const protectRoute = require('../../middlewares/auth.guard')
 
 /**
  * @swagger
@@ -74,6 +75,27 @@ router.post('/register', register);
  *         description: Internal server error
  */
 router.post('/login', login);
+
+
+
+/**
+ * @swagger
+ * 
+ * /api/v1/auth/logout
+ * tags: [Auth]
+ * content:
+ * application/json
+ * requestbody:
+ * responses:
+ * 200:
+ * description: Logout successful
+ * 404:
+ * description: No token provided
+ * 500:
+ * description: internal server error
+ * 
+ */
+router.post('/logout', protectRoute, logout)
 
 
 
